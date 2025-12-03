@@ -1,0 +1,26 @@
+{
+    "admin": {
+        "senha": "1234",
+        "nome": "Gerente Geral",
+        "cargo": "chefe",
+        "foto": "fotos/admin.png"
+    },
+    "joao": {
+        "senha": "1234",
+        "nome": "João da Silva",
+        "cargo": "funcionario",
+        "foto": "fotos/joao.png"
+    },
+    "maria": {
+        "senha": "1234",
+        "nome": "Maria Souza",
+        "cargo": "funcionario",
+        "foto": "fotos/maria.jpg"
+    },
+    "Vinicius": {
+        "senha": "1234",
+        "nome": "Vinicius Silvestre",
+        "cargo": "funcionario",
+        "foto": "fotos/Vinicius.png"
+    }
+}
