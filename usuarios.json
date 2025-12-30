@@ -22,5 +22,11 @@
         "nome": "Vinicius Silvestre",
         "cargo": "estagiário",
         "foto": "fotos/Vinicius.png"
+    },
+    "Daniel Silva": {
+        "senha": "1234",
+        "nome": "Daniel Silva",
+        "cargo": "Analista de Dados Industriais V",
+        "foto": "fotos/Daniel Calado.png"
     }
 }
