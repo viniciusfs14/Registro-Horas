@@ -8,9 +8,7 @@ import re
 from PIL import Image
 import altair as alt
 
-# --------------------------
-# 1. CONFIGURAÇÃO E CSS
-# --------------------------
+
 st.set_page_config(page_title="Radix Time Tracker", layout="wide", page_icon="⏱")
 
 PRIMARY_COLOR = "#6A1B9A"
@@ -18,7 +16,7 @@ SECONDARY_COLOR = "#AB47BC"
 BG_LIGHT = "#F3E5F5"
 SUCCESS_COLOR = "#43A047"
 DANGER_COLOR = "#D32F2F"
-CAMINHO_LOGO = "fotos/radix_logo.jpg"
+CAMINHO_LOGO = "fotos/radix_logo2.png"
 
 def configurar_estilo():
     st.markdown(f"""
@@ -54,9 +52,6 @@ FILE_DB = "registro_atividades.csv"
 FILE_USERS = "usuarios.json"
 FILE_RITM_STATUS = "ritms_status.json"
 
-# --------------------------
-# 2. GERENCIAMENTO DE DADOS
-# --------------------------
 def init_db():
     if not os.path.exists(FILE_DB):
         df = pd.DataFrame(columns=["usuario", "atividade", "hora_inicio", "hora_fim", "duracao_formatada", "segundos_totais", "data", "tipo"])
@@ -104,9 +99,7 @@ def extrair_ritm(texto):
         return match.group(1)
     return None
 
-# --------------------------
-# 3. ESTADO DA SESSÃO
-# --------------------------
+
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "timer_status" not in st.session_state:
@@ -121,9 +114,6 @@ if "atividade_atual" not in st.session_state:
 init_db()
 configurar_estilo()
 
-# --------------------------
-# 4. TELAS
-# --------------------------
 
 def login_screen():
     col1, col2, col3 = st.columns([1, 1.5, 1])
@@ -181,7 +171,7 @@ def funcionario_dashboard():
 
     df = pd.read_csv(FILE_DB)
     
-    # Header com totais
+  
     total_hoje_seg = 0
     if not df.empty:
         df_hoje = df[(df["usuario"] == user_id) & (df["data"] == hoje_str)]
@@ -204,10 +194,10 @@ def funcionario_dashboard():
 
     st.markdown("---")
 
-    # ABAS DO FUNCIONÁRIO
+
     tab_timer, tab_manual, tab_ritm = st.tabs(["⏱ Cronômetro", "📝 Registro Manual", "💼 Gestão de Chamados (RITM)"])
 
-    # --- ABA 1: CRONÔMETRO ---
+  
     with tab_timer:
         col_input, col_timer = st.columns([1, 1])
         with col_input:
@@ -298,7 +288,7 @@ def funcionario_dashboard():
             else:
                  container_timer.markdown(f"<div class='big-timer' style='color:#BDBDBD'>00:00:00</div>", unsafe_allow_html=True)
 
-    # --- ABA 2: MANUAL ---
+   
     with tab_manual:
         with st.form("manual_form"):
             c_m1, c_m2, c_m3 = st.columns(3)
@@ -327,12 +317,11 @@ def funcionario_dashboard():
                 else:
                     st.error("Hora fim < Hora início")
 
-    # --- ABA 3: GESTÃO DE RITMS (FUNCIONÁRIO) ---
+   
     with tab_ritm:
         st.subheader("Meus Chamados e Entregas")
         st.info("Aqui você gerencia o encerramento dos chamados em que trabalhou.")
-        
-        # 1. Filtrar registros do usuário atual e extrair RITMs
+   
         if not df.empty:
             df_user_ritm = df[df["usuario"] == user_id].copy()
             df_user_ritm["ritm_code"] = df_user_ritm["atividade"].apply(extrair_ritm)
@@ -341,24 +330,18 @@ def funcionario_dashboard():
             if df_user_ritm.empty:
                 st.write("Você ainda não registrou atividades vinculadas a um RITM.")
             else:
-                # Carregar Status global
-                status_db = carregar_status_ritm()
                 
-                # Agrupar
-                # Note que calculamos o TOTAL GERAL do RITM (mesmo que outros tenham ajudado)
-                # para enviar no email, pois o cliente quer saber o total gasto no chamado.
-                # Se quiser apenas as horas DESTE usuário, mude o filtro abaixo.
+                status_db = carregar_status_ritm()
                 
                 meus_ritms = df_user_ritm['ritm_code'].unique()
                 
                 for ritm in meus_ritms:
-                    # Pega dados GERAIS do RITM (para somar horas de todos os envolvidos no email)
+                
                     df_ritm_global = df[df["atividade"].str.contains(ritm, na=False)]
                     total_horas_ritm = df_ritm_global["segundos_totais"].sum()
                     
                     status_atual = status_db.get(ritm, "Aberto")
-                    
-                    # Layout do Card
+                 
                     cor_status = SUCCESS_COLOR if status_atual == "Aberto" else "#BDBDBD"
                     icon_status = "🟢 Em Andamento" if status_atual == "Aberto" else "🔒 Encerrado"
                     
@@ -393,7 +376,7 @@ def funcionario_dashboard():
                             </a>
                             """, unsafe_allow_html=True)
 
-    # DASHBOARD PESSOAL (Gráficos)
+    
     st.divider()
     st.markdown("### 📊 Minhas Estatísticas")
     periodo = st.radio("Período", ["Hoje", "7 Dias", "30 Dias"], horizontal=True)
@@ -444,7 +427,7 @@ def chefe_dashboard():
         st.warning("Sem dados.")
         return
 
-    # --- ABA 1 ADMIN: GERAL ---
+ 
     with tab_geral:
         c1, c2 = st.columns(2)
         with c1:
@@ -466,7 +449,7 @@ def chefe_dashboard():
         k3.metric("Média", formatar_tempo(total_secs / len(df_filtered) if len(df_filtered) > 0 else 0).split(".")[0])
         st.dataframe(df_filtered, use_container_width=True, hide_index=True)
 
-    # --- ABA 2 ADMIN: RELATÓRIO RITM (APENAS VISUALIZAÇÃO) ---
+  
     with tab_ritm_admin:
         st.subheader("Status dos Chamados (Read-Only)")
         
@@ -477,16 +460,15 @@ def chefe_dashboard():
             st.info("Nenhum RITM encontrado.")
         else:
             status_db = carregar_status_ritm()
-            # Agrupar dados
+           
             resumo_ritm = df_ritms.groupby(['ritm_code'])['segundos_totais'].sum().reset_index()
             
-            # Mostrar como tabela ou cards informativos
+            
             for idx, row in resumo_ritm.iterrows():
                 ritm = row['ritm_code']
                 total = row['segundos_totais']
                 status = status_db.get(ritm, "Aberto")
-                
-                # Visualização
+              
                 cor_card = "#E8F5E9" if status == "Aberto" else "#EEEEEE" # Verde claro ou Cinza
                 cor_texto = "#2E7D32" if status == "Aberto" else "#616161"
                 icon = "🟢 EM ABERTO" if status == "Aberto" else "🔒 FECHADO"
@@ -500,9 +482,7 @@ def chefe_dashboard():
                     </div>
                     """, unsafe_allow_html=True)
 
-# --------------------------
-# 5. ROTEAMENTO
-# --------------------------
+
 if not st.session_state.logged_in:
     login_screen()
 else:
